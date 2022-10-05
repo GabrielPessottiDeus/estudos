@@ -1,11 +1,13 @@
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Scanner;
 
 class glista {
-    private questao05[] array = new questao05[60];
+    private questao05[] array = new questao05[100];
     private int n = 0;
 
     public glista() {
@@ -39,10 +41,10 @@ class glista {
         }
 
         for(int i = n; i > 0; i--) {
-            array[i] = array[i - 1];
+            array[i] = array[i - 1].clonar();
         }
 
-        array[0] = jogo;
+        array[0] = jogo.clonar();
         n++;
     }
 
@@ -51,7 +53,7 @@ class glista {
             throw new Exception("ERRO");
         }
 
-        array[n] = jogo;
+        array[n] = jogo.clonar();
         n++;
     }
 
@@ -61,10 +63,10 @@ class glista {
         }
 
         for(int i = n; i > posicao; i--) {
-            array[i] = array[i - 1];
+            array[i] = array[i - 1].clonar();
         }
 
-        array[posicao] = jogo;
+        array[posicao] = jogo.clonar();
         n++;
     }
 
@@ -73,11 +75,11 @@ class glista {
             throw new Exception("ERRO");
         }
 
-        questao05 jogo = array[0];
+        questao05 jogo = array[0].clonar();
         n--;
 
         for(int i = 0; i < n; i++) {
-            array[i] = array[i + 1];
+            array[i] = array[i + 1].clonar();
         }
 
         return jogo;
@@ -88,7 +90,7 @@ class glista {
             throw new Exception("ERRO");
         }
 
-        return array[--n];
+        return array[--n].clonar();
     }
 
     public questao05 remover (int posicao) throws Exception {
@@ -96,22 +98,14 @@ class glista {
             throw new Exception("ERRO");
         }
 
-        questao05 jogo = array[posicao];
+        questao05 jogo = array[posicao].clonar();
         n--;
 
         for(int i = posicao; i < n; i++) {
-            array[i] = array[i + 1];
+            array[i] = array[i + 1].clonar();
         }
 
         return jogo;
-    }
-
-    static Boolean isFim(String palavra) {
-        boolean result = false;
-        if (palavra.charAt(0) == 'F' && palavra.charAt(1) == 'I' && palavra.charAt(2) == 'M') {
-            result = true;
-        }
-        return result;
     }
 
     questao05 lerID(String id) throws Exception {
@@ -161,7 +155,7 @@ class glista {
 
     public void mostrar() {
         for(int i = 0; i < n; i++) {
-            System.out.printf("[" + i + "]" + array[i].getJogo());
+            System.out.printf("[" + i + "]" + array[i].getJogo() + "\n");
         }
     }
 
@@ -226,6 +220,12 @@ public class questao05 {
     private String developers;
     private String[] genres;
     private String Jogo;
+
+    public questao05 clonar() {
+        questao05 clone = new questao05();
+        clone.nome = this.nome;
+        return clone;
+    }
 
     public int getApp_id() {
         return app_id;
@@ -386,32 +386,54 @@ public class questao05 {
     public void imprimir() {
         this.Jogo = Jogo + (getApp_id() + " " + getNome() + " " + getReleaseDate() + " " + getOwners() + " " + getAge() + " ");
         DecimalFormat novo = new DecimalFormat("0.00");
-        this.Jogo = Jogo +(novo.format(getPrice()) + " ");
-        this.Jogo = Jogo +(getDlcs() + " ");
+        Jogo = Jogo +(novo.format(getPrice()) + " ");
+        Jogo = Jogo +(getDlcs() + " ");
         for(int i = 0; i < getLanguages().length - 1; i++) {
-            this.Jogo = Jogo +(getLanguages()[i] + ", ");
+            Jogo = Jogo +(getLanguages()[i] + ", ");
         }
-        this.Jogo = Jogo +(getLanguages()[getLanguages().length - 1] + " " + getWebsite() + " " + getWindows() + " " + getMac()
+        Jogo = Jogo +(getLanguages()[getLanguages().length - 1] + " " + getWebsite() + " " + getWindows() + " " + getMac()
         + " " + getLinux() + " "
         + ((int)Math.round(getUpvotes() * 100)) + "% "
         + (int)(getAvg_pt() / 60) + "h " + (getAvg_pt() % 60) + "m ");
-        this.Jogo = Jogo +(getDevelopers() + " " + "[");
+        Jogo = Jogo +(getDevelopers() + " " + "[");
         for(int i = 0; i < getGenres().length - 1; i++) {
-            this.Jogo = Jogo +(getGenres()[i] + ", ");
+            Jogo = Jogo +(getGenres()[i] + ", ");
         }
-        this.Jogo = Jogo +(getGenres()[getGenres().length - 1] + "]");
+        Jogo = Jogo +(getGenres()[getGenres().length - 1] + "]");
     }
+    
 
-    public  void ler(String frase) throws IOException, ParseException {
-        questao05 jogo = new questao05();
-        Scanner arquivo = new Scanner(new File("games.csv"));
+    /*public void imprimir() {
+        this.Jogo = Jogo + app_id + " " + nome + " " + release_date + " " + owners + " " + age + " ";
+        DecimalFormat novo = new DecimalFormat("0.00");
+        Jogo = Jogo +novo.format(price) + " ";
+        Jogo = Jogo +dlcs + " ";
+        for(int i = 0; i < languages.length - 1; i++) {
+            Jogo = Jogo +(languages[i] + ", ");
+        }
+        Jogo = Jogo +(languages[languages.length - 1] + " " + website + " " + windows + " " + mac
+        + " " + linux + " "
+        + ((int)Math.round(upvotes * 100)) + "% "
+        + (int)(avg_pt / 60) + "h " + (avg_pt % 60) + "m ");
+        Jogo = Jogo +(developers + " " + "[");
+        for(int i = 0; i < genres.length - 1; i++) {
+            Jogo = Jogo +(genres[i] + ", ");
+        }
+        Jogo = Jogo +(genres[genres.length - 1] + "]");
+    }
+    */
+
+    public void ler(String frase) throws IOException, ParseException {
+        BufferedReader arquivo = new BufferedReader(new FileReader("games.csv"));
         String[] linha = new String[4403];
+        String temp = "";
 
         int n = 0;
-        while (arquivo.hasNext()) {
-            linha[n] = arquivo.nextLine();
+        while ((temp = arquivo.readLine()) != null) {
+            linha[n] = temp;
             n++;
         }
+        arquivo.close();
 
         for(int i = 0; i < n; i++) {
             String categoria = "";
@@ -421,30 +443,30 @@ public class questao05 {
                 categoria = categoria + linha[i].charAt(k);
             }
 
-            if(categoria.equals(frase)) {
-                jogo = new questao05();
+            if(categoria.contains(frase)) {
+
                 String[] array = linha[i].split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
-                jogo.setApp_id(Integer.parseInt(array[0]));
-                jogo.setNome(array[1]);
-                jogo.setReleaseDate(array[2].replaceAll("\"", ""));
-                jogo.setOwners(array[3]);
-                jogo.setAge(Integer.parseInt(array[4]));
-                jogo.setPrice(Float.parseFloat(array[5]));
-                jogo.setDlcs(Integer.parseInt(array[6]));
-                jogo.setLanguages(array[7].replaceAll("'", "").replaceAll("\"", "").split(","));
-                jogo.setWebsite(array[8]);
-                jogo.setWindows(Boolean.parseBoolean(array[9]));
-                jogo.setMac(Boolean.parseBoolean(array[10]));
-                jogo.setLinux(Boolean.parseBoolean(array[11]));
-                jogo.setUpvotes(Float.parseFloat(array[12]) / (Float.parseFloat(array[12]) + (Float.parseFloat(array[13]))));
-                jogo.setAvg_pt(Integer.parseInt(array[14]));
-                jogo.setDevelopers(array[15].replaceAll("\"", ""));
-                jogo.setGenres(array[16].replaceAll("\"", "").split(","));
-                //jogo.imprimir();
+                this.setApp_id(Integer.parseInt(array[0]));
+                this.setNome(array[1]);
+                this.setReleaseDate(array[2].replaceAll("\"", ""));
+                this.setOwners(array[3]);
+                this.setAge(Integer.parseInt(array[4]));
+                this.setPrice(Float.parseFloat(array[5]));
+                this.setDlcs(Integer.parseInt(array[6]));
+                this.setLanguages(array[7].replaceAll("'", "").replaceAll("\"", "").split(","));
+                this.setWebsite(array[8]);
+                this.setWindows(Boolean.parseBoolean(array[9]));
+                this.setMac(Boolean.parseBoolean(array[10]));
+                this.setLinux(Boolean.parseBoolean(array[11]));
+                this.setUpvotes(Float.parseFloat(array[12]) / (Float.parseFloat(array[12]) + (Float.parseFloat(array[13]))));
+                this.setAvg_pt(Integer.parseInt(array[14]));
+                this.setDevelopers(array[15].replaceAll("\"", ""));
+                this.setGenres(array[16].replaceAll("\"", "").split(","));
+                this.imprimir();
+                return;
             }
         }
-        
     }
 
     static Boolean isFim(String palavra) {
@@ -464,7 +486,6 @@ public class questao05 {
         while(isFim(palavra) == false) {
             questao05 GAME = new questao05();
             GAME.ler(palavra);
-
             glistaGame.inserirFim(GAME);
             palavra = arquivo.nextLine();
         }
